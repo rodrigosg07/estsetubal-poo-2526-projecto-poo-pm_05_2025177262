@@ -42,6 +42,8 @@ public abstract class Carta {
         estado = EstadoCarta.VIRADA_BAIXO;
     }
 
+    public abstract void ativar(Jogo jogo);
+
 
 
 

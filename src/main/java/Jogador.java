@@ -1,29 +1,40 @@
 public class Jogador{
-    private String nome;
+    private String nomeJogador;
     private int pontuacao;
     private int tentativas;
 
-    public Jogador(String nome, int pontuacao, int tentativas){
-        if(nome==null) throw new IllegalArgumentException("Tem de colocar nome");
+    public Jogador(String nomeJogador, int pontuacao, int tentativas){
+        if(nomeJogador==null) throw new IllegalArgumentException("Tem de colocar nome");
         if(pontuacao<0) throw new IllegalArgumentException("A pontuação não pode ser negativa");
-        if(tentativas<0) throw new IllegalArgumentException("As tentativas não podem ser negativas");
-        this.nome=nome;
+        this.nomeJogador=nomeJogador;
         this.pontuacao=pontuacao;
-        this.tentativas=tentativas;
+        setTentativas(this.tentativas);
+    }
+
+    public String getNomeJogador(){
+        return nomeJogador;
     }
 
     public int getTentativas() {
         return tentativas;
     }
 
+    public int setTentativas(int maxTentativas) {
+        if(tentativas<0) throw new IllegalArgumentException("As tentativas não podem ser negativas");
+        return  tentativas;
+    }
+
     public int getPontuacao() {
         return pontuacao;
     }
 
+    public void incrementarTentativas(int t){
+        this.tentativas += t;
+    }
     public void adicionarPontos(int pontos){
         pontuacao+=pontos;
     }
-    public void retirarTentativas(){
+    public void consumirTentativa(){
         tentativas--;
     }
     public void reset(int maxtentativas){
