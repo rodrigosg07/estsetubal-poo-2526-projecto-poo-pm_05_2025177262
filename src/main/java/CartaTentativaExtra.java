@@ -1,4 +1,4 @@
-public class CartaTentativaExtra extends Carta {
+public class CartaTentativaExtra extends CartaEspecial {
     public CartaTentativaExtra(int id, String simbolo){
         super(id, simbolo);
     }

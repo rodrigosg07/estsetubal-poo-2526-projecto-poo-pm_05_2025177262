@@ -77,7 +77,8 @@ public class Jogo {
             try {
                 primeiraSelecionada.virar();
                 segunda.virar();
-            } catch (JogoException ignored){
+            } catch (JogoException j){
+                System.out.println("Deve apenas selecionar cartas viradas para baixo!");
             }
         }
 
@@ -86,7 +87,7 @@ public class Jogo {
     }
 
     public boolean venceu() {
-        return paresEncontrados == (tabuleiro.getTotalPares());
+        return paresEncontrados == (tabuleiro.getCartas().size() / 2);
     }
 
     public boolean perdeu() {

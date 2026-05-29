@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CartaTrocarPosicao extends Carta {
+public class CartaTrocarPosicao extends CartaEspecial {
     public CartaTrocarPosicao(int id, String simbolo){
         super(id, simbolo);
     }

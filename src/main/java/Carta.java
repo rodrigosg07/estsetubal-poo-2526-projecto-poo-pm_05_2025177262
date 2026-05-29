@@ -37,23 +37,7 @@ public abstract class Carta {
         return estado;
     }
 
-    //Carta não emparelhada deve voltar a ser virada para baixo
-    public void resetEstado(){
-        estado = EstadoCarta.VIRADA_BAIXO;
+    public void ativar(Jogo jogo){
+        jogo.getJogador().adicionarPontos(10);
     }
-
-    public abstract void ativar(Jogo jogo);
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
