@@ -30,11 +30,11 @@ public class Jogo {
 
 
     public void mudarNivel(int idNivel){
-        if (idNivel == 1) this.nivelAtual = new Nivel(1, 20, 4, 4);
-        else if (idNivel == 2) this.nivelAtual = new Nivel(2, 15, 4, 4);
-        else if (idNivel == 3) this.nivelAtual = new Nivel(3, 15, 5, 5);
-        else if (idNivel == 4) this.nivelAtual = new Nivel(4, 12, 5, 5);
-        else this.nivelAtual = new Nivel(5, 12, 6, 6);
+        if (idNivel == 1) this.nivelAtual = new Nivel(1, 25, 4, 4);
+        else if (idNivel == 2) this.nivelAtual = new Nivel(2, 20, 4, 4);
+        else if (idNivel == 3) this.nivelAtual = new Nivel(3, 22, 5, 5);
+        else if (idNivel == 4) this.nivelAtual = new Nivel(4, 18, 5, 5);
+        else this.nivelAtual = new Nivel(5, 25, 6, 6);
 
         this.tabuleiro = new Tabuleiro(this.nivelAtual);
         this.jogador.setTentativas(this.nivelAtual.getMaxTentativas());
