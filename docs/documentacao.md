@@ -24,4 +24,7 @@ A classe Carta declara o método ativar(Jogo jogo) mas não o implementa, delega
 2.2 - É a proteção dos dados internos de um objeto. O encapsulamento agrupa os dados (atributos) e os métodos que os manipulam 
 na mesma classe, escondendo o estado interno do mundo exterior (usando private) e permitindo a alteração apenas através de 
 regras rigorosas (usando métodos públicos).
-2.3 - Herança: 
+2.3 - Herança: É o mecanismo que permite criar novas classes (subclasses) baseadas em classes já existentes (superclasses). A subclasse herda os atributos e comportamentos da classe mãe, promovendo a reutilização de código e criando uma hierarquia clara.
+
+
+Exemplo no teu projeto: As tuas classes CartaNormal, CartaRevelar, CartaTentativaExtra, etc., herdam diretamente da classe Carta. Isto significa que não tiveste de escrever o código de virar(), getSimbolo() ou o atributo id de novo para cada uma delas. Elas já nascem com tudo o que uma Carta tem, precisando apenas de especificar o que as torna únicas.
