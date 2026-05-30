@@ -17,6 +17,8 @@ public abstract class Carta {
     public void virar(){
         if (estado == EstadoCarta.VIRADA_BAIXO){
             estado = EstadoCarta.VIRADA_CIMA;
+        }else if(estado == EstadoCarta.VIRADA_CIMA){
+            estado = EstadoCarta.VIRADA_BAIXO;
         }
     }
 

@@ -8,7 +8,6 @@ public class Jogador{
         if(pontuacao<0) throw new IllegalArgumentException("A pontuação não pode ser negativa");
         this.nomeJogador=nomeJogador;
         this.pontuacao=pontuacao;
-        setTentativas(tentativas);
     }
 
     public String getNomeJogador(){
@@ -19,9 +18,9 @@ public class Jogador{
         return tentativas;
     }
 
-    public int setTentativas(int tentativas) {
+    public void setTentativas(int tentativas) {
         if(tentativas<0) throw new IllegalArgumentException("As tentativas não podem ser negativas");
-        return tentativas;
+        this.tentativas = tentativas;
     }
 
     public int getPontuacao() {

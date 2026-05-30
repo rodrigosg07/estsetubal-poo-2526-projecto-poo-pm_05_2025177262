@@ -21,6 +21,8 @@ public class App extends Application {
     private Jogo jogo;
     private Label labelPontos;
     private Label labelTentativas;
+    private Scene cenaEscolhaNiveis;
+    private Button btnPrimeiraCarta;
 
     public void start(Stage primaryStage){
         Jogador jogador = new Jogador("Player 1",0,0);
@@ -49,38 +51,53 @@ public class App extends Application {
         Button button6 = new Button("Nivel 3");
         Button button7 = new Button("Nivel 4");
         Button button8 = new Button("Nivel 5");
+        Button btnVoltarInicial = new Button("Voltar ao Início");
+
         HBox hbox1 = new HBox(20);
         VBox vBox2 = new VBox(20);
         hbox1.setAlignment(Pos.CENTER);
         hbox1.getChildren().addAll(button4,button5,button6,button7,button8);
+
         vBox2.setAlignment(Pos.CENTER);
-        vBox2.getChildren().addAll(label1,label2,hbox1);
-        Scene cena2 = new Scene(vBox2,400,300);
+        vBox2.getChildren().addAll(label2,hbox1,btnVoltarInicial);
+        cenaEscolhaNiveis = new Scene(vBox2, 500, 300);
 
-        //-------------Nivel1 (cena3)--------------
-        jogo.mudarNivel(1);
-        jogo.getTabuleiro().inicializar();
-        jogo.getTabuleiro().embaralhar();
+        button4.setOnAction(e -> iniciarNivel(1, primaryStage));
+        button5.setOnAction(e -> iniciarNivel(2, primaryStage));
+        button6.setOnAction(e -> iniciarNivel(3, primaryStage));
+        button7.setOnAction(e -> iniciarNivel(4, primaryStage));
+        button8.setOnAction(e -> iniciarNivel(5, primaryStage));
 
-        Scene cena3 = criarCenaDoJogo();
-        primaryStage.setTitle("Nivel 1");
+        btnVoltarInicial.setOnAction(e -> {
+            primaryStage.setScene(cena1);
+            primaryStage.setTitle("Tela Inicial");
+        });
 
-        //-------- Navegação entre cenas ----------
+        //-------- Navegação dos primeiros botoes (pagina inicial) ----------
         button1.setOnAction(event -> {
             jogo.mudarNivel(1);
             jogo.getTabuleiro().inicializar();
             jogo.getTabuleiro().embaralhar();
-            primaryStage.setScene(criarCenaDoJogo());
+            primaryStage.setScene(criarCenaDoJogo(primaryStage));
         });
 
         button2.setOnAction(event -> {
-            primaryStage.setScene(cena2);
+            primaryStage.setScene(cenaEscolhaNiveis);
             primaryStage.setTitle("Menu dos Niveis");
         });
 
         button3.setOnAction(event -> Platform.exit());
     }
-    private Scene criarCenaDoJogo(){
+    private void iniciarNivel(int idNivel, Stage primaryStage) {
+        jogo.mudarNivel(idNivel);
+        jogo.getTabuleiro().inicializar();
+        jogo.getTabuleiro().embaralhar();
+        btnPrimeiraCarta = null;
+        Scene cenaDoJogo = criarCenaDoJogo(primaryStage);
+        primaryStage.setScene(cenaDoJogo);
+        primaryStage.setTitle("Nível " + idNivel);
+    }
+    private Scene criarCenaDoJogo(Stage primaryStage){
         VBox vBox = new VBox(10);
         vBox.setAlignment(Pos.CENTER);
 
@@ -110,7 +127,14 @@ public class App extends Application {
 
             grid.add(btnCarta,i%colunas,i/colunas);
         }
-        vBox.getChildren().addAll(labelTitulo,labelPontos,infoBox,grid);
+
+        Button btnDesistir = new Button("Desistir / Voltar aos Níveis");
+        btnDesistir.setOnAction(e -> {
+            primaryStage.setScene(cenaEscolhaNiveis);
+            primaryStage.setTitle("Menu dos Níveis");
+        });
+
+        vBox.getChildren().addAll(labelTitulo,infoBox,grid,btnDesistir);
         return new Scene(vBox,400,500);
     }
     private void processarClique(Carta carta, Button btn, GridPane grid){
@@ -137,6 +161,7 @@ public class App extends Application {
         } catch (JogoException ex){
             System.out.println(ex.getMessage());
         }
+
     }
     private void PausarEEsconder(Carta segundaCartaLogica, Carta primeiraCartaLogica, Button btnSegunda, GridPane grid){
         PauseTransition pausa = new PauseTransition(Duration.seconds(1));
@@ -165,4 +190,3 @@ public class App extends Application {
         launch(args);
     }
 }
-//nivel2 - 16, nivel3 - 20, nivel4 - 20, nivel5 - 36
