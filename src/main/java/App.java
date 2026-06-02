@@ -3,6 +3,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -11,10 +12,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.sql.SQLOutput;
 import java.util.List;
-
+import javafx.scene.effect.GaussianBlur;
+import javafx.scene.layout.StackPane;
 import static javafx.application.Application.launch;
 
 public class App extends Application {
@@ -23,6 +24,9 @@ public class App extends Application {
     private Label labelTentativas;
     private Scene cenaEscolhaNiveis;
     private Button btnPrimeiraCarta;
+    private VBox vBoxFundo;
+    private VBox overlayFimDeJogo;
+    private Label labelMensagemFoco;
 
     public void start(Stage primaryStage){
         Jogador jogador = new Jogador("Player 1",0,0);
@@ -98,8 +102,8 @@ public class App extends Application {
         primaryStage.setTitle("Nível " + idNivel);
     }
     private Scene criarCenaDoJogo(Stage primaryStage){
-        VBox vBox = new VBox(10);
-        vBox.setAlignment(Pos.CENTER);
+        vBoxFundo = new VBox(10);
+        vBoxFundo.setAlignment(Pos.CENTER);
 
         Label labelTitulo= new Label("Nivel: " + jogo.getNivelAtual().getNumero());
         labelPontos = new Label("Pontos: " + jogo.getJogador().getPontuacao());
@@ -123,7 +127,7 @@ public class App extends Application {
             Button btnCarta= new Button("?");
             btnCarta.setPrefSize(80,80);
 
-            btnCarta.setOnAction(event -> processarClique(cartaLogica, btnCarta, grid));
+            btnCarta.setOnAction(event -> processarClique(cartaLogica, btnCarta, grid,primaryStage));
 
             grid.add(btnCarta,i%colunas,i/colunas);
         }
@@ -134,10 +138,24 @@ public class App extends Application {
             primaryStage.setTitle("Menu dos Níveis");
         });
 
-        vBox.getChildren().addAll(labelTitulo,infoBox,grid,btnDesistir);
-        return new Scene(vBox,400,500);
+        vBoxFundo.getChildren().addAll(labelTitulo,infoBox,grid,btnDesistir);
+        labelMensagemFoco = new Label();
+        Button btnVoltarOverlay = new Button("Voltar aos Níveis");
+        btnVoltarOverlay.setOnAction(e -> {
+            primaryStage.setScene(cenaEscolhaNiveis);
+            primaryStage.setTitle("Menu dos Níveis");
+        });
+            overlayFimDeJogo = new VBox(20);
+            overlayFimDeJogo.setAlignment(Pos.CENTER);
+            overlayFimDeJogo.setStyle("-fx-background-color: rgba(0, 0, 0, 0.75);");
+            overlayFimDeJogo.getChildren().addAll(labelMensagemFoco, btnVoltarOverlay);
+            overlayFimDeJogo.setVisible(false); // Começa invisível!
+
+            StackPane root = new StackPane();
+            root.getChildren().addAll(vBoxFundo, overlayFimDeJogo);
+        return new Scene(root,400,500);
     }
-    private void processarClique(Carta carta, Button btn, GridPane grid){
+    private void processarClique(Carta carta, Button btn, GridPane grid,Stage primaryStage){
         if(jogo.isBloqueado() || carta.getEstado() != EstadoCarta.VIRADA_BAIXO) return;
 
         try{
@@ -152,11 +170,17 @@ public class App extends Application {
                     System.out.println("Poder: "+jogo.getPoderAtivado());
                 }
                 if(jogo.venceu()){
-                    System.out.println("Ganhaste o nível!");
+                    labelMensagemFoco.setText("Vitória!\nParabéns!");
+                    labelMensagemFoco.setStyle("-fx-text-fill: #4CAF50; -fx-font-size: 34px; -fx-font-weight: bold; -fx-text-alignment: center;");
+                    vBoxFundo.setEffect(new GaussianBlur(12));
+                    overlayFimDeJogo.setVisible(true);
                 }
             }
             if(jogo.perdeu()){
-                System.out.println("Perdeste! Sem tentativas.");
+                labelMensagemFoco.setText("Game Over!\nSem tentativas.");
+                labelMensagemFoco.setStyle("-fx-text-fill: #F44336; -fx-font-size: 34px; -fx-font-weight: bold; -fx-text-alignment: center;");
+                vBoxFundo.setEffect(new GaussianBlur(12));
+                overlayFimDeJogo.setVisible(true);
             }
         } catch (JogoException ex){
             System.out.println(ex.getMessage());
@@ -181,6 +205,17 @@ public class App extends Application {
             atualizarLabels();
         });
         pausa.play();
+    }
+    private void mostrarMensagemFimDeJogo(String titulo, String mensagem, Stage primaryStage) {
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(null);
+        alerta.setContentText(mensagem);
+
+        alerta.showAndWait();
+
+        primaryStage.setScene(cenaEscolhaNiveis);
+        primaryStage.setTitle("Menu dos Níveis");
     }
     private void atualizarLabels() {
         labelPontos.setText("Pontos: " + jogo.getJogador().getPontuacao());

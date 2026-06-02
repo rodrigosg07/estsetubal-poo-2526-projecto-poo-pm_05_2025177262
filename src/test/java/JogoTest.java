@@ -9,31 +9,35 @@ class JogoTest {
 
     @BeforeEach
     void setUp() {
-        jogador = new Jogador("A", 1, 1);
+        jogador = new Jogador("A", 0, 25);
         jogo = new Jogo(jogador);
+        jogo.mudarNivel(1);
     }
 
     @Test
     void testInicializacaoNivelUm() {
         assertEquals(1, jogo.getNivelAtual().getNumero());
-        assertEquals(15, jogador.getTentativas(), "Nível 1 deve começar com 25 tentativas!");
+        assertEquals(25, jogador.getTentativas(), "Nível 1 deve começar com 25 tentativas!");
         assertEquals(0, jogador.getPontuacao(), "A pontuação inicial deve ser 0!");
     }
 
     @Test
     void testEscolhaDePrimeiraCartaNaoConsomeTentativa() throws JogoException {
-        Carta c1 = jogo.getTabuleiro().getCartas().getFirst();
+        Carta c1 = new CartaNormal(1, "A");
+        jogo.getTabuleiro().getCartas().add(c1);
 
         boolean formouPar = jogo.escolherCarta(c1);
 
         assertFalse(formouPar, "A primeira carta de um turno nunca pode fechar um par!");
         assertEquals(EstadoCarta.VIRADA_CIMA, c1.getEstado());
-        assertEquals(15, jogador.getTentativas(), "Tentativas não devem mudar no primeiro clique!");
+        assertEquals(25, jogador.getTentativas(), "Tentativas não devem mudar no primeiro clique!");
     }
 
     @Test
     void testExcecaoAoEscolherCartaJaVirada() throws JogoException {
-        Carta c1 = jogo.getTabuleiro().getCartas().getFirst();
+        Carta c1 = new CartaNormal(1, "A");
+        jogo.getTabuleiro().getCartas().add(c1);
+
         jogo.escolherCarta(c1);
 
         assertThrows(JogoException.class, () -> jogo.escolherCarta(c1), "Devia lançar JogoException ao clicar numa carta que não está VIRADA_BAIXO!");
