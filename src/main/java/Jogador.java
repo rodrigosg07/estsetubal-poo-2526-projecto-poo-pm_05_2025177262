@@ -8,6 +8,7 @@ public class Jogador{
         if(pontuacao<0) throw new IllegalArgumentException("A pontuação não pode ser negativa");
         this.nomeJogador=nomeJogador;
         this.pontuacao=pontuacao;
+        this.tentativas=tentativas;
     }
 
     public String getNomeJogador(){
@@ -39,5 +40,8 @@ public class Jogador{
     public void reset(int maxtentativas){
         pontuacao=0;
         tentativas= maxtentativas;
+    }
+    public void resetPontos(){
+        this.pontuacao=0;
     }
 }

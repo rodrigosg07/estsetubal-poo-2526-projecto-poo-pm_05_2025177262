@@ -77,12 +77,20 @@ A qualidade do domínio é validada através de uma classe de testes automatizad
 aleatório do baralhamento simulando cenários e instâncias de cartas controladas (pelo programador).
 Os casos de teste dividem-se em três vertentes essenciais:
 
-5.1 - Casos Normais: Validação do estado inicial do Nível 1 e garantia de que a seleção da primeira carta de um turno não deduz 
-tentativas desnecessariamente.
+5.1 - Validação de Estado e Regras de Negócio: Testes direcionados à verificação dos ciclos de vida e transições válidas das entidades
+base. Validam, por exemplo, que qualquer Carta "nasce" obrigatoriamente no estado VIRADA_BAIXO, que o mecanismo de alternância de estado 
+funciona corretamente em tempo real, e que a ativação de uma carta padrão reflete de imediato os pontos esperados no perfil do Jogador.
 
-5.2 - Casos Limite e Erros: Verificação do correto disparo da exceção JogoException ao selecionar inputs inválidos e teste do 
-estado bloqueado do "motor" de jogo após um par falhado.
+5.2 - Prevenção de Inconsistências: Foco na blindagem do domínio para impedir que o sistema assuma estados corrompidos. Estes testes 
+verificam o "disparo" iminente de exceções (como IllegalArgumentException) na inserção de parâmetros inválidos. Inclui o 
+bloqueio na criação de um Nivel configurado com um total ímpar de cartas no tabuleiro (inviabilizando o jogo) ou com um número 
+irrealista de tentativas máximas (zero ou negativas), assim como a recusa de cartas com símbolos nulos.
 
-5.3 - Casos Polimórficos: Testes focados em garantir que o método ativar() produz efeitos perfeitamente distintos no Jogador dependendo 
-da subclasse real testada (ex: acréscimo de jogadas com CartaTentativaExtra versus pontuação simples com CartaNormal), comprovando o 
-comportamento dinâmico do sistema.
+5.3 - Comportamento Dinâmico e Polimorfismo: Testes estruturados para provar a escalabilidade do motor do jogo face a diferentes 
+lógicas encapsuladas. Garantem que o uso do método polimórfico genérico ativar() produz impactos no ecossistema do jogo 
+radicalmente distintos consoante a subclasse analisada:
+- CartaTentativaExtra: Valida a inserção simultânea de pontuação bonificada e do incremento no limite de jogadas do jogador.
+- CartaRevelar: Comprova a iteração e modificação massiva do estado do tabuleiro, forçando todas as cartas fechadas para o estado 
+VIRADA_CIMA.
+-CartaRevelarPar: Atesta a manipulação certeira da lista do tabuleiro para identificar o símbolo alvo e emparelhar instantaneamente 
+as cartas correspondentes.

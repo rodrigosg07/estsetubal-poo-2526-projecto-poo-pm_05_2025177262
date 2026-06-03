@@ -42,6 +42,10 @@ public class Tabuleiro {
     public Carta getCarta(int posicao) {
         return cartas.get(posicao);
     }
+
+    public void setCartas(List<Carta> cartas) {
+        this.cartas = cartas;
+    }
 }
 
 

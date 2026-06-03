@@ -10,8 +10,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.AudioClip;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import java.io.File;
 import java.sql.SQLOutput;
 import java.util.List;
 import javafx.scene.effect.GaussianBlur;
@@ -27,8 +31,18 @@ public class App extends Application {
     private VBox vBoxFundo;
     private VBox overlayFimDeJogo;
     private Label labelMensagemFoco;
+    private AudioClip somCarta = new AudioClip(new File("src/main/resources/sounds/cardsound.wav").toURI().toString());
+    private AudioClip somBotao = new AudioClip(new File("src/main/resources/sounds/btnsound.wav").toURI().toString());
+    private AudioClip somParCorreto = new AudioClip(new File("src/main/resources/sounds/correctcardsound.wav").toURI().toString());
+    private AudioClip jogoPerdido = new AudioClip(new File("src/main/resources/sounds/failsound.wav").toURI().toString());
+    private AudioClip jogoGanho = new AudioClip(new File("src/main/resources/sounds/winsound.wav").toURI().toString());
+    private Media media = new Media(new File("src/main/resources/sounds/backgroundmusic.wav").toURI().toString());
+    private MediaPlayer player = new MediaPlayer(media);
 
     public void start(Stage primaryStage){
+        player.setCycleCount(MediaPlayer.INDEFINITE);
+        player.setVolume(0.75);
+        player.play();
         Jogador jogador = new Jogador("Player 1",0,0);
         jogo = new Jogo(jogador);
 
@@ -66,19 +80,35 @@ public class App extends Application {
         vBox2.getChildren().addAll(label2,hbox1,btnVoltarInicial);
         cenaEscolhaNiveis = new Scene(vBox2, 500, 300);
 
-        button4.setOnAction(e -> iniciarNivel(1, primaryStage));
-        button5.setOnAction(e -> iniciarNivel(2, primaryStage));
-        button6.setOnAction(e -> iniciarNivel(3, primaryStage));
-        button7.setOnAction(e -> iniciarNivel(4, primaryStage));
-        button8.setOnAction(e -> iniciarNivel(5, primaryStage));
-
+        button4.setOnAction(e -> {
+            somBotao.play();
+            iniciarNivel(1, primaryStage);
+        });
+        button5.setOnAction(e -> {
+            somBotao.play();
+            iniciarNivel(2, primaryStage);
+        });
+        button6.setOnAction(e -> {
+            somBotao.play();
+            iniciarNivel(3, primaryStage);
+        });
+        button7.setOnAction(e -> {
+            somBotao.play();
+            iniciarNivel(4, primaryStage);
+        });
+        button8.setOnAction(e -> {
+            somBotao.play();
+            iniciarNivel(5, primaryStage);
+        });
         btnVoltarInicial.setOnAction(e -> {
+            somBotao.play();
             primaryStage.setScene(cena1);
             primaryStage.setTitle("Tela Inicial");
         });
 
         //-------- Navegação dos primeiros botoes (pagina inicial) ----------
         button1.setOnAction(event -> {
+            somBotao.play();
             jogo.mudarNivel(1);
             jogo.getTabuleiro().inicializar();
             jogo.getTabuleiro().embaralhar();
@@ -86,16 +116,21 @@ public class App extends Application {
         });
 
         button2.setOnAction(event -> {
+            somBotao.play();
             primaryStage.setScene(cenaEscolhaNiveis);
             primaryStage.setTitle("Menu dos Niveis");
         });
 
-        button3.setOnAction(event -> Platform.exit());
+        button3.setOnAction(event -> {
+            somBotao.play();
+            Platform.exit();
+        });
     }
     private void iniciarNivel(int idNivel, Stage primaryStage) {
         jogo.mudarNivel(idNivel);
         jogo.getTabuleiro().inicializar();
         jogo.getTabuleiro().embaralhar();
+        jogo.getJogador().resetPontos();
         btnPrimeiraCarta = null;
         Scene cenaDoJogo = criarCenaDoJogo(primaryStage);
         primaryStage.setScene(cenaDoJogo);
@@ -142,6 +177,8 @@ public class App extends Application {
         labelMensagemFoco = new Label();
         Button btnVoltarOverlay = new Button("Voltar aos Níveis");
         btnVoltarOverlay.setOnAction(e -> {
+            jogoGanho.stop();
+            jogoPerdido.stop();
             primaryStage.setScene(cenaEscolhaNiveis);
             primaryStage.setTitle("Menu dos Níveis");
         });
@@ -157,6 +194,7 @@ public class App extends Application {
     }
     private void processarClique(Carta carta, Button btn, GridPane grid,Stage primaryStage){
         if(jogo.isBloqueado() || carta.getEstado() != EstadoCarta.VIRADA_BAIXO) return;
+        somCarta.play();
 
         try{
             Carta primeira = jogo.getPrimeiraSelecionada();
@@ -166,10 +204,16 @@ public class App extends Application {
             if(!acertou && primeira != null){
                 PausarEEsconder(carta, primeira, btn, grid);
             }else if(acertou){
+                somParCorreto.play();
                 if(!jogo.getPoderAtivado().isEmpty()){
                     System.out.println("Poder: "+jogo.getPoderAtivado());
                 }
                 if(jogo.venceu()){
+                    player.pause();
+                    jogoGanho.play();
+                    PauseTransition pausaMusica1 = new PauseTransition(Duration.seconds(8));
+                    pausaMusica1.setOnFinished(event -> player.play());
+                    pausaMusica1.play();
                     labelMensagemFoco.setText("Vitória!\nParabéns!");
                     labelMensagemFoco.setStyle("-fx-text-fill: #4CAF50; -fx-font-size: 34px; -fx-font-weight: bold; -fx-text-alignment: center;");
                     vBoxFundo.setEffect(new GaussianBlur(12));
@@ -177,6 +221,14 @@ public class App extends Application {
                 }
             }
             if(jogo.perdeu()){
+                player.pause();
+                jogoPerdido.play();
+                PauseTransition pausaMusica2 = new PauseTransition(Duration.seconds(2));
+                pausaMusica2.setOnFinished(event -> player.play());
+                pausaMusica2.play();
+                if(!jogoPerdido.isPlaying()){
+                    player.play();
+                }
                 labelMensagemFoco.setText("Game Over!\nSem tentativas.");
                 labelMensagemFoco.setStyle("-fx-text-fill: #F44336; -fx-font-size: 34px; -fx-font-weight: bold; -fx-text-alignment: center;");
                 vBoxFundo.setEffect(new GaussianBlur(12));
