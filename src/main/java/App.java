@@ -20,6 +20,9 @@ import java.sql.SQLOutput;
 import java.util.List;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.layout.StackPane;
+
+import javax.lang.model.element.NestingKind;
+
 import static javafx.application.Application.launch;
 
 public class App extends Application {
@@ -27,10 +30,15 @@ public class App extends Application {
     private Label labelPontos;
     private Label labelTentativas;
     private Scene cenaEscolhaNiveis;
+    private Scene cenaPrincipal;
     private Button btnPrimeiraCarta;
     private VBox vBoxFundo;
     private VBox overlayFimDeJogo;
     private Label labelMensagemFoco;
+    private Label lblOverlayTitulo;
+    private Label lblOverlayIcone;
+    private Label lblOverlayPontos;
+    private Label lblOverlayTentativas;
     private AudioClip somCarta = new AudioClip(new File("src/main/resources/sounds/cardsound.wav").toURI().toString());
     private AudioClip somBotao = new AudioClip(new File("src/main/resources/sounds/btnsound.wav").toURI().toString());
     private AudioClip somParCorreto = new AudioClip(new File("src/main/resources/sounds/correctcardsound.wav").toURI().toString());
@@ -46,85 +54,124 @@ public class App extends Application {
         Jogador jogador = new Jogador("Player 1",0,0);
         jogo = new Jogo(jogador);
 
-        //----------------Tela Inicial (cena1)----------------------------
-
-        Label label1 = new Label("Jogo da Memória");
-        Button button1 = new Button("Novo Jogo");
-        Button button2 = new Button("Continuar");
-        Button button3 = new Button("Sair");
-        VBox vBox1 = new VBox(20);
-        vBox1.setAlignment(Pos.CENTER);
-        vBox1.getChildren().addAll(label1, button1, button2, button3);
-        Scene cena1 = new Scene(vBox1,400,300);
+        //----------------Tela Inicial----------------------------
+        cenaPrincipal = criarCenaMenuPrincipal(primaryStage);
+        cenaEscolhaNiveis = criarCenaEscolaNiveis(primaryStage);
 
         primaryStage.setTitle("Tela Inicial");
-        primaryStage.setScene(cena1);
+        primaryStage.setScene(cenaPrincipal);
         primaryStage.show();
+        }
 
-        //--------tela de escolha de nivel (cena2)---------------------
+        private Scene criarCenaMenuPrincipal(Stage primaryStage){
+        StackPane root = new StackPane();
+        root.setStyle("-fx-background-color: #4286f4;");
+        //---------Titulo do jogo--------------
+        VBox conteudoPrincipal = new VBox(50);
+        conteudoPrincipal.setAlignment(Pos.CENTER);
+        VBox blocoTitulo = new VBox(-15);
+        blocoTitulo.setAlignment(Pos.CENTER);
+        Label txtMemoria = new Label("Memória");
+        Label txtDe = new Label("de");
+        Label txtElefante = new Label("elefante");
+        //--------Cores do titulo------------
+        String estiloTitulo = "-fx-font-family: 'Arial Black'; -fx-font-size: 50px; -fx-font-weight: bold; -fx-text-fill: linear-gradient(to bottom, #fff779, #ff79b4); -fx-effect: dropshadow(one-pass-box, black, 0, 0, 4, 4);";
+        txtMemoria.setStyle(estiloTitulo);
+        txtDe.setStyle(estiloTitulo);
+        txtElefante.setStyle(estiloTitulo);
+        blocoTitulo.getChildren().addAll(txtMemoria,txtDe,txtElefante);
+        //-------botoes---------
+        VBox blocoBotoes = new VBox(20);
+        blocoBotoes.setAlignment(Pos.CENTER);
+        Button btnNovoJogo = new Button("▶  NOVO JOGO");
+        Button btnContinuar = new Button("CONTINUAR");
+        Button btnSair = new Button("✖  SAIR");
+        //-------apresentacao dos botoes---------
+        String estiloBotao = "-fx-background-color: #2D1A68; -fx-text-fill: white; -fx-font-family: 'Arial Black'; -fx-font-size: 18px; -fx-border-color: white; -fx-border-width: 3px; -fx-background-radius: 20; -fx-border-radius: 18; -fx-min-width: 240px; -fx-min-height: 50px; -fx-cursor: hand;";
+        btnNovoJogo.setStyle(estiloBotao);
+        btnContinuar.setStyle(estiloBotao);
+        btnSair.setStyle(estiloBotao);
+        //----- Acoes dos botoes-----
+            btnNovoJogo.setOnAction(event -> {
+                somBotao.play();
+                iniciarNivel(1,primaryStage);
+            });
+            btnContinuar.setOnAction(event -> {
+                somBotao.play();
+                primaryStage.setScene(cenaEscolhaNiveis);
+                primaryStage.setTitle("Menu dos Niveis");
+            });
+            btnSair.setOnAction(event -> {
+                somBotao.play();
+                Platform.exit();
+            });
+            blocoBotoes.getChildren().addAll(btnNovoJogo,btnContinuar,btnSair);
+            conteudoPrincipal.getChildren().addAll(blocoTitulo,blocoBotoes);
+            root.getChildren().add(conteudoPrincipal);
 
-        Label label2 = new Label("Escolha o nivel:");
-        Button button4 = new Button("Nivel 1");
-        Button button5 = new Button("Nivel 2");
-        Button button6 = new Button("Nivel 3");
-        Button button7 = new Button("Nivel 4");
-        Button button8 = new Button("Nivel 5");
-        Button btnVoltarInicial = new Button("Voltar ao Início");
+            return new Scene(root,400,650);
 
-        HBox hbox1 = new HBox(20);
-        VBox vBox2 = new VBox(20);
-        hbox1.setAlignment(Pos.CENTER);
-        hbox1.getChildren().addAll(button4,button5,button6,button7,button8);
 
-        vBox2.setAlignment(Pos.CENTER);
-        vBox2.getChildren().addAll(label2,hbox1,btnVoltarInicial);
-        cenaEscolhaNiveis = new Scene(vBox2, 500, 300);
+    }
+    private Scene criarCenaEscolaNiveis(Stage primaryStage){
+        StackPane root = new StackPane();
+        root.setStyle("-fx-background-color: #4286f4;");
 
-        button4.setOnAction(e -> {
+        VBox vBoxPrincipal = new VBox(30);
+        vBoxPrincipal.setAlignment(Pos.CENTER);
+        //----Titulo------
+        Label lblTitulo = new Label("ESCOLHA O NÍVEL");
+        lblTitulo.setStyle("-fx-font-family: 'Arial Black'; -fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white; -fx-effect: dropshadow(one-pass-box, black, 0, 0, 3, 3);");
+        //-----botoes dos niveis------
+        VBox caixaBotoes = new VBox(15);
+        caixaBotoes.setAlignment(Pos.CENTER);
+        String estiloBotao = "-fx-background-color: #2D1A68; -fx-text-fill: white; -fx-font-family: 'Arial Black'; -fx-font-size: 18px; -fx-border-color: white; -fx-border-width: 3px; -fx-background-radius: 20; -fx-border-radius: 18; -fx-min-width: 220px; -fx-min-height: 50px; -fx-cursor: hand;";
+        Button btnNivel1 = new Button("NÍVEL 1");
+        Button btnNivel2 = new Button("NÍVEL 2");
+        Button btnNivel3 = new Button("NÍVEL 3");
+        Button btnNivel4 = new Button("NÍVEL 4");
+        Button btnNivel5 = new Button("NÍVEL 5");
+
+        btnNivel1.setStyle(estiloBotao);
+        btnNivel2.setStyle(estiloBotao);
+        btnNivel3.setStyle(estiloBotao);
+        btnNivel4.setStyle(estiloBotao);
+        btnNivel5.setStyle(estiloBotao);
+        //-----Acoes dos botoes-----
+        btnNivel1.setOnAction(event -> {
             somBotao.play();
-            iniciarNivel(1, primaryStage);
+            iniciarNivel(1,primaryStage);
         });
-        button5.setOnAction(e -> {
+        btnNivel2.setOnAction(event -> {
             somBotao.play();
-            iniciarNivel(2, primaryStage);
+            iniciarNivel(2,primaryStage);
         });
-        button6.setOnAction(e -> {
+        btnNivel3.setOnAction(event -> {
             somBotao.play();
-            iniciarNivel(3, primaryStage);
+            iniciarNivel(3,primaryStage);
         });
-        button7.setOnAction(e -> {
+        btnNivel4.setOnAction(event -> {
             somBotao.play();
-            iniciarNivel(4, primaryStage);
+            iniciarNivel(4,primaryStage);
         });
-        button8.setOnAction(e -> {
+        btnNivel5.setOnAction(event -> {
             somBotao.play();
-            iniciarNivel(5, primaryStage);
+            iniciarNivel(5,primaryStage);
         });
-        btnVoltarInicial.setOnAction(e -> {
+        caixaBotoes.getChildren().addAll(btnNivel1,btnNivel2,btnNivel3,btnNivel4,btnNivel5);
+        //----botao voltar-------
+        Button btnVoltar = new Button("«  VOLTAR AO INÍCIO");
+        btnVoltar.setStyle("-fx-background-color: #2D1A68; -fx-text-fill: white; -fx-font-family: 'Arial Black'; -fx-font-size: 16px; -fx-border-color: white; -fx-border-width: 3px; -fx-background-radius: 20; -fx-border-radius: 18; -fx-min-width: 220px; -fx-min-height: 45px; -fx-cursor: hand;");
+        btnVoltar.setOnAction(event -> {
             somBotao.play();
-            primaryStage.setScene(cena1);
+            primaryStage.setScene(cenaPrincipal);
             primaryStage.setTitle("Tela Inicial");
         });
+        vBoxPrincipal.getChildren().addAll(lblTitulo,caixaBotoes,btnVoltar);
+        root.getChildren().add(vBoxPrincipal);
 
-        //-------- Navegação dos primeiros botoes (pagina inicial) ----------
-        button1.setOnAction(event -> {
-            somBotao.play();
-            jogo.mudarNivel(1);
-            jogo.getTabuleiro().inicializar();
-            jogo.getTabuleiro().embaralhar();
-            primaryStage.setScene(criarCenaDoJogo(primaryStage));
-        });
+        return new Scene(root,400,650);
 
-        button2.setOnAction(event -> {
-            somBotao.play();
-            primaryStage.setScene(cenaEscolhaNiveis);
-            primaryStage.setTitle("Menu dos Niveis");
-        });
-
-        button3.setOnAction(event -> {
-            somBotao.play();
-            Platform.exit();
-        });
     }
     private void iniciarNivel(int idNivel, Stage primaryStage) {
         jogo.mudarNivel(idNivel);
@@ -137,30 +184,52 @@ public class App extends Application {
         primaryStage.setTitle("Nível " + idNivel);
     }
     private Scene criarCenaDoJogo(Stage primaryStage){
-        vBoxFundo = new VBox(10);
+        StackPane root = new StackPane();
+        root.setStyle("-fx-background-color: #4286f4;");
+        vBoxFundo = new VBox(25);
         vBoxFundo.setAlignment(Pos.CENTER);
+       //-------Titulo do Nivel-------
+        Label labelTitulo = new Label("NÍVEL "+jogo.getNivelAtual().getNumero());
+        labelTitulo.setStyle("-fx-font-family: 'Arial Black'; -fx-font-size: 38px; -fx-font-weight: bold; -fx-text-fill: white; -fx-text-transform: uppercase;");
+        //------- Titulo dos as outras informacoes----------
+        labelTentativas = new Label(("TENTATIVAS: " + jogo.getJogador().getTentativas()));
+        labelPontos = new Label("PONTOS: " + jogo.getJogador().getPontuacao());
 
-        Label labelTitulo= new Label("Nivel: " + jogo.getNivelAtual().getNumero());
-        labelPontos = new Label("Pontos: " + jogo.getJogador().getPontuacao());
-        labelTentativas = new Label(("Tentativas: " + jogo.getJogador().getTentativas()));
+        String estiloInfo = "-fx-font-family: 'Arial Black'; -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;";
+        labelTentativas.setStyle(estiloInfo);
+        labelPontos.setStyle(estiloInfo);
 
-        HBox infoBox = new HBox(20);
+        HBox infoBox = new HBox(40);
         infoBox.setAlignment(Pos.CENTER);
-        infoBox.getChildren().addAll(labelPontos,labelTentativas);
+        infoBox.getChildren().addAll(labelTentativas,labelPontos);
 
+        //-------Tabuleiro-------------
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
-        grid.setHgap(10);
-        grid.setVgap(10);
+        grid.setHgap(6);
+        grid.setVgap(6);
 
         List<Carta> cartas = jogo.getTabuleiro().getCartas();
         int colunas = jogo.getNivelAtual().getColunas();
+
+        double larguraCarta =(360.0/colunas);
+        double alturaCarta = 60.0;
+
+        int tamanhoLetra;
+        if (colunas >= 5) {
+            tamanhoLetra = 9;
+        } else if (colunas == 4) {
+            tamanhoLetra = 11;
+        } else {
+            tamanhoLetra = 13;
+        }
 
         for (int i = 0; i<cartas.size(); i++){
             Carta cartaLogica = cartas.get(i);
 
             Button btnCarta= new Button("?");
-            btnCarta.setPrefSize(80,80);
+            btnCarta.setPrefSize(larguraCarta, alturaCarta);
+            btnCarta.setStyle("-fx-font-family: 'Arial Black'; -fx-font-size: " + tamanhoLetra + "px; -fx-padding: 0; -fx-cursor: hand; -fx-background-radius: 10; -fx-border-radius: 10;");
 
             btnCarta.setOnAction(event -> processarClique(cartaLogica, btnCarta, grid,primaryStage));
 
@@ -168,29 +237,56 @@ public class App extends Application {
         }
 
         Button btnDesistir = new Button("Desistir / Voltar aos Níveis");
+        btnDesistir.setStyle("-fx-background-color: #2D1A68; -fx-text-fill: white; -fx-font-family: 'Arial Black'; -fx-font-size: 16px; -fx-border-color: white; -fx-border-width: 3px; -fx-background-radius: 20; -fx-border-radius: 18; -fx-min-width: 180px; -fx-min-height: 45px; -fx-cursor: hand;");
         btnDesistir.setOnAction(e -> {
+            somBotao.play();
             primaryStage.setScene(cenaEscolhaNiveis);
             primaryStage.setTitle("Menu dos Níveis");
         });
 
         vBoxFundo.getChildren().addAll(labelTitulo,infoBox,grid,btnDesistir);
-        labelMensagemFoco = new Label();
-        Button btnVoltarOverlay = new Button("Voltar aos Níveis");
-        btnVoltarOverlay.setOnAction(e -> {
+        overlayFimDeJogo = new VBox(25);
+        overlayFimDeJogo.setAlignment(Pos.CENTER);
+        overlayFimDeJogo.setStyle("-fx-background-color: rgba(20, 30, 55, 0.85);");
+        overlayFimDeJogo.setVisible(false);
+        lblOverlayTitulo = new Label();
+        lblOverlayTitulo.setStyle("-fx-font-family: 'Arial Black'; -fx-font-size: 32px; -fx-text-fill: white; -fx-text-alignment: center; -fx-font-weight: bold;");
+        lblOverlayIcone = new Label();
+        lblOverlayIcone.setStyle("-fx-font-size: 60px;");
+        lblOverlayPontos = new Label();
+        lblOverlayPontos.setStyle("-fx-font-family: 'Arial Black'; -fx-font-size: 24px; -fx-text-fill: white; -fx-font-weight: bold;");
+
+        lblOverlayTentativas = new Label();
+        lblOverlayTentativas.setStyle("-fx-font-family: 'Arial Black'; -fx-font-size: 24px; -fx-text-fill: white; -fx-font-weight: bold;");
+        String estiloBotaoOverlay = "-fx-background-color: #2D1A68; -fx-text-fill: white; -fx-font-family: 'Arial Black'; -fx-font-size: 16px; -fx-border-color: white; -fx-border-width: 3px; -fx-background-radius: 20; -fx-border-radius: 18; -fx-min-width: 220px; -fx-min-height: 48px; -fx-cursor: hand;";
+
+        Button btnRepetir = new Button("↻  REPETIR");
+        btnRepetir.setStyle(estiloBotaoOverlay);
+        btnRepetir.setOnAction(e -> {
+            somBotao.play();
+            jogoGanho.stop();
+            jogoPerdido.stop();
+            iniciarNivel(jogo.getNivelAtual().getNumero(), primaryStage);
+        });
+        Button btnMenu = new Button("«  MENU");
+        btnMenu.setStyle(estiloBotaoOverlay);
+        btnMenu.setOnAction(e -> {
+            somBotao.play();
             jogoGanho.stop();
             jogoPerdido.stop();
             primaryStage.setScene(cenaEscolhaNiveis);
             primaryStage.setTitle("Menu dos Níveis");
         });
-            overlayFimDeJogo = new VBox(20);
-            overlayFimDeJogo.setAlignment(Pos.CENTER);
-            overlayFimDeJogo.setStyle("-fx-background-color: rgba(0, 0, 0, 0.75);");
-            overlayFimDeJogo.getChildren().addAll(labelMensagemFoco, btnVoltarOverlay);
-            overlayFimDeJogo.setVisible(false); // Começa invisível!
-
-            StackPane root = new StackPane();
-            root.getChildren().addAll(vBoxFundo, overlayFimDeJogo);
-        return new Scene(root,400,500);
+        overlayFimDeJogo.getChildren().addAll(
+                lblOverlayTitulo,
+                lblOverlayIcone,
+                lblOverlayPontos,
+                lblOverlayTentativas,
+                btnRepetir,
+                btnMenu
+        );
+        root.getChildren().addAll(vBoxFundo, overlayFimDeJogo);
+        return new Scene(root,400,650);
     }
     private void processarClique(Carta carta, Button btn, GridPane grid,Stage primaryStage){
         if(jogo.isBloqueado() || carta.getEstado() != EstadoCarta.VIRADA_BAIXO) return;
@@ -214,8 +310,11 @@ public class App extends Application {
                     PauseTransition pausaMusica1 = new PauseTransition(Duration.seconds(8));
                     pausaMusica1.setOnFinished(event -> player.play());
                     pausaMusica1.play();
-                    labelMensagemFoco.setText("Vitória!\nParabéns!");
-                    labelMensagemFoco.setStyle("-fx-text-fill: #4CAF50; -fx-font-size: 34px; -fx-font-weight: bold; -fx-text-alignment: center;");
+
+                    lblOverlayTitulo.setText("NÍVEL " + jogo.getNivelAtual().getNumero() + "\nCONCLUÍDO!");
+                    lblOverlayPontos.setText("PONTOS: " + jogo.getJogador().getPontuacao());
+                    lblOverlayTentativas.setText("TENTATIVAS: " + jogo.getJogador().getTentativas());
+
                     vBoxFundo.setEffect(new GaussianBlur(12));
                     overlayFimDeJogo.setVisible(true);
                 }
@@ -226,9 +325,11 @@ public class App extends Application {
                 PauseTransition pausaMusica2 = new PauseTransition(Duration.seconds(2));
                 pausaMusica2.setOnFinished(event -> player.play());
                 pausaMusica2.play();
-                if(!jogoPerdido.isPlaying()){
-                    player.play();
-                }
+
+                lblOverlayTitulo.setText("NÍVEL " + jogo.getNivelAtual().getNumero() + "\nFALHADO!");;
+                lblOverlayPontos.setText("PONTOS: " + jogo.getJogador().getPontuacao());
+                lblOverlayTentativas.setText("TENTATIVAS: " + jogo.getJogador().getTentativas());
+
                 labelMensagemFoco.setText("Game Over!\nSem tentativas.");
                 labelMensagemFoco.setStyle("-fx-text-fill: #F44336; -fx-font-size: 34px; -fx-font-weight: bold; -fx-text-alignment: center;");
                 vBoxFundo.setEffect(new GaussianBlur(12));
@@ -270,8 +371,8 @@ public class App extends Application {
         primaryStage.setTitle("Menu dos Níveis");
     }
     private void atualizarLabels() {
-        labelPontos.setText("Pontos: " + jogo.getJogador().getPontuacao());
-        labelTentativas.setText("Tentativas: " + jogo.getJogador().getTentativas());
+        labelPontos.setText("PONTOS: " + jogo.getJogador().getPontuacao());
+        labelTentativas.setText("TENTATIVAS: " + jogo.getJogador().getTentativas());
     }
     public static void main(String[] args) {
         launch(args);
