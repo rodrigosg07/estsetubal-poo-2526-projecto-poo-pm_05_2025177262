@@ -9,4 +9,6 @@ public class JogoExceptionTest {
 
         assertEquals(mensagemErro, jogoException.getMessage());
     }
+
+
 }

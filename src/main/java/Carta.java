@@ -6,7 +6,7 @@ public abstract class Carta {
     //protected para apenas ser acessada pela propria classe e seus "filhos"
     protected Carta(int id, String simbolo){
         if (simbolo == null || simbolo.isBlank()){
-            throw new IllegalArgumentException("O símbolo não pode estar vazio");
+            throw new SimboloException("O símbolo não pode estar vazio");
         }
         this.id = id;
         this.simbolo = simbolo;

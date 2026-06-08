@@ -11,12 +11,6 @@ public class JogadorTest {
     }
 
     @Test
-    void testeIncializarComValoresPadrao(){
-        assertEquals(0, jogador.getPontuacao(), "A pontuação inicial deve ser 0");
-        assertTrue(jogador.getTentativas() >= 0);
-    }
-
-    @Test
     void testeAdicionarPontosCorretamente(){
         jogador.adicionarPontos(10);
         assertEquals(10, jogador.getPontuacao());

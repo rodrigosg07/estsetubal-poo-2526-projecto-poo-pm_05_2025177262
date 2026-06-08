@@ -20,7 +20,8 @@ public class Tabuleiro {
         int totalCartas = numLinhas * numColunas;
         int totalPares = totalCartas / 2;
         int proximoid = cartas.size();
-        List<String> simbolos = new ArrayList<>(Arrays.asList("Gato", "Cão", "Passaro", "Cobra", "Peixe", "Macaco", "Girafa", "Leão", "Crocodilo", "Tigre", "Cabra", "Vaca", "Porco", "Sapo", "Tartaruga", "Flamingo", "Rato", "Tubarão"));
+        List<String> simbolos = new ArrayList<>(Arrays.asList("Gato", "Cão", "Passaro", "Cobra", "Peixe", "Macaco", "Girafa", "Leão",
+                "Crocodilo", "Tigre", "Cabra", "Vaca", "Porco", "Sapo", "Tartaruga", "Flamingo", "Rato", "Tubarão"));
         Collections.shuffle(simbolos);
 
         for (int i = 0; i < totalPares - 1; i++) {

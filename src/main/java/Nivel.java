@@ -5,9 +5,9 @@ public class Nivel {
     private int colunas;
 
     public Nivel(int numero, int maxTentativas, int linhas, int colunas) {
-        if (linhas <= 0 || colunas <= 0) throw new IllegalArgumentException("Dimensões de tabuleiro inválidas");
-        if (linhas * colunas % 2 != 0 ) throw new IllegalArgumentException("Dimensões de tabuleiro inválidas");
-        if (maxTentativas <= 0) throw new IllegalArgumentException("O maximo de tentativas deve ser positivo");
+        if (linhas <= 0 || colunas <= 0) throw new NivelException("Dimensões de tabuleiro inválidas");
+        if (linhas * colunas % 2 != 0 ) throw new NivelException("Dimensões de tabuleiro inválidas");
+        if (maxTentativas <= 0) throw new NivelException("O maximo de tentativas deve ser positivo");
         this.numero = numero;
         this.maxTentativas = maxTentativas;
         this.linhas = linhas;

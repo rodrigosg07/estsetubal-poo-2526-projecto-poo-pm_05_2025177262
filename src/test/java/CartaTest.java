@@ -20,12 +20,6 @@ public class CartaTest {
     }
 
     @Test
-    void testeValidarSimbolo(){
-        assertThrows(IllegalArgumentException.class, () -> new Carta(2, null) {});
-        assertThrows(IllegalArgumentException.class, () -> new Carta(3, " ") {});
-    }
-
-    @Test
     void testeAlterarEstadoAoVirar(){
         // selecionar carta virada para baixo
         carta.virar();

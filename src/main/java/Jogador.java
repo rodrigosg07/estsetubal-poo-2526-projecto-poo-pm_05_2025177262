@@ -4,11 +4,11 @@ public class Jogador{
     private int tentativas;
 
     public Jogador(String nomeJogador, int pontuacao, int tentativas){
-        if(nomeJogador==null) throw new IllegalArgumentException("Tem de colocar nome");
-        if(pontuacao<0) throw new IllegalArgumentException("A pontuação não pode ser negativa");
+        if(nomeJogador==null) throw new JogadorException("Tem de colocar nome");
+        if(pontuacao<0) throw new JogadorException("A pontuação não pode ser negativa");
         this.nomeJogador=nomeJogador;
         this.pontuacao=pontuacao;
-        this.tentativas=tentativas;
+        setTentativas(tentativas);
     }
 
     public String getNomeJogador(){
@@ -20,7 +20,7 @@ public class Jogador{
     }
 
     public void setTentativas(int tentativas) {
-        if(tentativas<0) throw new IllegalArgumentException("As tentativas não podem ser negativas");
+        if(tentativas<0) throw new JogadorException("As tentativas não podem ser negativas");
         this.tentativas = tentativas;
     }
 

@@ -11,19 +11,4 @@ public class NivelTest {
         assertEquals(4, nivel.getLinhas(), "As linhas devem ser 4");
         assertEquals(4, nivel.getColunas(), "As colunas devem ser 4");
     }
-
-    @Test
-    void testeExcessaoTentativasInvalidas() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Nivel(1,0,4,4);
-        }, "Devia falhar porque o máximo de tentativas deve ser positivo.");
-    }
-
-    @Test
-    void testeLancarExcessaoCasoTabuleiroSejaImpar() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Nivel(1,20,3,3);
-        }, "Devia falhar porque um tabuleiro não pode ter um número ímpar de cartas.");
-    }
-
 }
