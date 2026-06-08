@@ -26,6 +26,7 @@ public class Jogo {
     }
     public String getPoderAtivado() { return poderAtivado; }
     public boolean isBloqueado() { return bloqueado; }
+    public int getParesEncontrados() { return paresEncontrados; }
 
 
 
