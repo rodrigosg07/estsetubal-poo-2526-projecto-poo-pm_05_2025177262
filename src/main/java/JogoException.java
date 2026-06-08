@@ -3,3 +3,4 @@ public class JogoException extends RuntimeException {
         super(message);
     }
 }
+// selecionar cartas que não estão VIRADAS_BAIXO
