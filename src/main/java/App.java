@@ -301,7 +301,7 @@ public class App extends Application {
         labelMensagemFoco.setVisible(false);
         if (!cartasDouradas.isEmpty()) {
             cartasDouradas.clear();
-            atualizarTabuleiroSincronizado(grid);
+            atualizarTabuleiroSincronizado(grid, primaryStage);
         }
         if (bloqueioPoder || jogo.isBloqueado() || carta.getEstado() != EstadoCarta.VIRADA_BAIXO) return;
         somCarta.play();
@@ -310,11 +310,11 @@ public class App extends Application {
             bloqueioPoder = true;
 
             carta.virar();
-            atualizarTabuleiroSincronizado(grid);
+            atualizarTabuleiroSincronizado(grid, primaryStage);
             PauseTransition pausaEspreitar = new PauseTransition(Duration.seconds(2));
             pausaEspreitar.setOnFinished(e -> {
                 carta.virar();
-                atualizarTabuleiroSincronizado(grid);
+                atualizarTabuleiroSincronizado(grid, primaryStage);
                 bloqueioPoder = false;
             });
             pausaEspreitar.play();
@@ -360,7 +360,7 @@ public class App extends Application {
                     labelMensagemFoco.setStyle("-fx-background-color: rgba(45, 26, 104, 0.9); -fx-text-fill: #FFD700; -fx-font-size: 18px; -fx-font-family: 'Arial Black'; -fx-font-weight: bold; -fx-padding: 8 15 8 15; -fx-background-radius: 10; -fx-effect: dropshadow(one-pass-box, black, 0, 0, 3, 3);");
                     labelMensagemFoco.setVisible(true);
                 }
-                atualizarTabuleiroSincronizado(grid);
+                atualizarTabuleiroSincronizado(grid, primaryStage);
                 atualizarLabels();
 
                 if (jogo.venceu()){
@@ -400,14 +400,16 @@ public class App extends Application {
             System.out.println(ex.getMessage());
         }
     }
-        private void ativarPoderVisual(GridPane grid){
-            PauseTransition pausaPoder = new PauseTransition(Duration.seconds(2));
-            pausaPoder.setOnFinished(e -> {
-                        labelMensagemFoco.setVisible(false);
-                    });
-            pausaPoder.play();
-        }
-    private void atualizarTabuleiroSincronizado(GridPane grid) {
+
+    private void ativarPoderVisual(GridPane grid){
+        PauseTransition pausaPoder = new PauseTransition(Duration.seconds(2));
+        pausaPoder.setOnFinished(e -> {
+            labelMensagemFoco.setVisible(false);
+        });
+        pausaPoder.play();
+    }
+
+    private void atualizarTabuleiroSincronizado(GridPane grid, Stage primaryStage) {
         List<Carta> cartas = jogo.getTabuleiro().getCartas();
         int colunas = jogo.getNivelAtual().getColunas();
 
@@ -419,30 +421,33 @@ public class App extends Application {
                 Button btn = (Button) grid.getChildren().get(i);
                 Carta c = cartas.get(i);
 
+                btn.setOnAction(event -> processarClique(c, btn, grid, primaryStage));
+
                 if (c.getEstado() != EstadoCarta.VIRADA_BAIXO) {
                     btn.setText(c.getSimbolo());
 
                     if(cartasDouradas.contains(c)){
                         String estiloBordaDourada  = " -fx-border-color: #FFD700; -fx-border-width: 3px; -fx-border-radius: 8;";
                         if (c.getSimbolo().toLowerCase().contains("elefante")) {
-                        btn.setStyle(estiloBase + estiloBordaDourada + " -fx-text-fill: #F44336;");
-                    } else {
-                        btn.setStyle(estiloBase + estiloBordaDourada + " -fx-text-fill: #000000;");
-                    }
+                            btn.setStyle(estiloBase + estiloBordaDourada + " -fx-text-fill: #F44336;");
+                        } else {
+                            btn.setStyle(estiloBase + estiloBordaDourada + " -fx-text-fill: #000000;");
+                        }
+                       } else {
+                           if (c.getSimbolo().toLowerCase().contains("elefante")) {
+                               btn.setStyle(estiloBase + " -fx-text-fill: #F44336;");
+                           } else {
+                               btn.setStyle(estiloBase + " -fx-text-fill: #000000;");
+                           }
+                       }
                 } else {
-                    if (c.getSimbolo().toLowerCase().contains("elefante")) {
-                        btn.setStyle(estiloBase + " -fx-text-fill: #F44336;");
-                    } else {
-                        btn.setStyle(estiloBase + " -fx-text-fill: #000000;");
-                    }
+                    btn.setText("?");
+                    btn.setStyle(estiloBase + " -fx-border-color: transparent; -fx-text-fill: black;");
                 }
-            } else {
-                btn.setText("?");
-                btn.setStyle(estiloBase + " -fx-border-color: transparent; -fx-text-fill: black;");
             }
         }
     }
-}
+
     private void PausarEEsconder(Carta segundaCartaLogica, Carta primeiraCartaLogica, Button btnSegunda, GridPane grid){
         PauseTransition pausa = new PauseTransition(Duration.seconds(1));
         pausa.setOnFinished(event -> {
@@ -464,6 +469,7 @@ public class App extends Application {
         });
         pausa.play();
     }
+
     private void mostrarMensagemFimDeJogo(String titulo, String mensagem, Stage primaryStage) {
         Alert alerta = new Alert(Alert.AlertType.INFORMATION);
         alerta.setTitle(titulo);
