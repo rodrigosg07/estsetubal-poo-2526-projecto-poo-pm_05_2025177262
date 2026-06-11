@@ -13,22 +13,19 @@ public class CartaTrocarPosicao extends CartaEspecial {
         jogo.avisarPoderAtivado("Trocar posição de cartas!");
 
         List<Carta> cartas = jogo.getTabuleiro().getCartas();
-        List<Carta> fechadas = new ArrayList<>(); // Lista temporária para guardar apenas as cartas fechadas(viradas para baixo)
-        List<Integer> indices = new ArrayList<>(); // Guarda as posições dessas cartas no tabuleiro
+        List<Carta> naoEncontradas = new ArrayList<>();
+        List<Integer> indices = new ArrayList<>();
 
         for (int i = 0; i < cartas.size(); i++){
-            if (cartas.get(i).getEstado() == EstadoCarta.VIRADA_BAIXO){
-                fechadas.add(cartas.get(i));
+            if (cartas.get(i).getEstado() != EstadoCarta.EMPARELHADA){
+                naoEncontradas.add(cartas.get(i));
                 indices.add(i);
             }
         }
-
-        Collections.shuffle(fechadas);
+        Collections.shuffle(naoEncontradas);
 
         for (int i = 0; i < indices.size(); i++){
-            cartas.set(indices.get(i), fechadas.get(i));
-            // Troca a carta da posição original
-            // pela carta embaralhada
+            cartas.set(indices.get(i), naoEncontradas.get(i));
         }
     }
 }

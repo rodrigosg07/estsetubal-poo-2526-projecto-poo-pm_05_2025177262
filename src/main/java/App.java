@@ -50,7 +50,7 @@ public class App extends Application {
 
     public void start(Stage primaryStage){
         player.setCycleCount(MediaPlayer.INDEFINITE);
-        player.setVolume(0.75);
+        player.setVolume(2);
         player.play();
         Jogador jogador = new Jogador("Player 1",0,0);
         jogo = new Jogo(jogador);
