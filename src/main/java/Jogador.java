@@ -37,9 +37,8 @@ public class Jogador{
     public void consumirTentativa(){
         tentativas--;
     }
-    public void reset(int maxtentativas){
+    public void resetTentativas(int maxtentativas){
         pontuacao=0;
-        tentativas= maxtentativas;
     }
     public void resetPontos(){
         this.pontuacao=0;

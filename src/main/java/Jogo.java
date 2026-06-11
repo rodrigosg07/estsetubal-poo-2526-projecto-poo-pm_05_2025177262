@@ -6,7 +6,7 @@ public class Jogo {
     private int paresEncontrados;
     private boolean bloqueado;
     private String poderAtivado;
-
+    private boolean modoRevelarEscolha;
     public Jogo(Jogador jogador){
         this.jogador = jogador;
         mudarNivel(1);
@@ -42,6 +42,7 @@ public class Jogo {
         this.paresEncontrados = 0;
         this.bloqueado = false;
         this.poderAtivado = "";
+        this.modoRevelarEscolha = false;
     }
 
     public boolean escolherCarta(Carta carta) {
@@ -64,6 +65,9 @@ public class Jogo {
             paresEncontrados++;
 
             carta.ativar(this);
+            if (this.poderAtivado != null && this.poderAtivado.toLowerCase().contains("tentativa")) {
+                jogador.setTentativas(jogador.getTentativas() + 1);
+            }
 
             primeiraSelecionada = null;
             return true;
@@ -102,4 +106,8 @@ public class Jogo {
     public void avisarPoderAtivado(String poder){
         this.poderAtivado = poder;
     }
+
+    public boolean isModoRevelarEscolha() { return modoRevelarEscolha; }
+
+    public void setModoRevelarEscolha(boolean modo) { this.modoRevelarEscolha = modo; }
 }

@@ -5,8 +5,11 @@ public class CartaTentativaExtra extends CartaEspecial {
 
     @Override
     public void ativar(Jogo jogo) {
+        int nivelAtual = jogo.getNivelAtual().getNumero();
+        int tentativasAAdicionar = (nivelAtual == 5) ? 3 : 2;
         jogo.getJogador().adicionarPontos(20);
-        jogo.getJogador().incrementarTentativas(1);
-        jogo.avisarPoderAtivado("Tentativa extra!");
+        int tentativasAtuais = jogo.getJogador().getTentativas();
+        jogo.getJogador().incrementarTentativas(tentativasAAdicionar);
+        jogo.avisarPoderAtivado("Ganhou +" + tentativasAAdicionar + " tentativas extra!");
     }
 }

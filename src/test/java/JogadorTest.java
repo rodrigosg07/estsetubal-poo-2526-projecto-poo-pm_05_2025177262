@@ -1,5 +1,6 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class JogadorTest {
@@ -28,5 +29,19 @@ public class JogadorTest {
 
         jogador.incrementarTentativas(2);
         assertEquals(tentativasInicias + 3, jogador.getTentativas());
+    }
+
+    @Test
+    void testeResetDePontos(){
+        jogador.resetPontos();
+
+        assertEquals(0, jogador.getPontuacao());
+    }
+
+    @Test
+    void testeResetDeTentativas(){
+        jogador.resetTentativas(10);
+
+        assertEquals(10, jogador.getTentativas());
     }
 }

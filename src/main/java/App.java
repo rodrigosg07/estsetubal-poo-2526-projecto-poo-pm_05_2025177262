@@ -16,7 +16,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.File;
-import java.sql.SQLOutput;
 import java.util.List;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.layout.StackPane;
@@ -27,6 +26,8 @@ import static javafx.application.Application.launch;
 
 public class App extends Application {
     private Jogo jogo;
+    private List<Carta> cartasDouradas = new java.util.ArrayList<>();
+    private boolean bloqueioPoder = false;
     private Label labelPontos;
     private Label labelTentativas;
     private Scene cenaEscolhaNiveis;
@@ -179,6 +180,7 @@ public class App extends Application {
         jogo.getTabuleiro().embaralhar();
         jogo.getJogador().resetPontos();
         btnPrimeiraCarta = null;
+        cartasDouradas.clear();
         Scene cenaDoJogo = criarCenaDoJogo(primaryStage);
         primaryStage.setScene(cenaDoJogo);
         primaryStage.setTitle("Nível " + idNivel);
@@ -244,7 +246,14 @@ public class App extends Application {
             primaryStage.setTitle("Menu dos Níveis");
         });
 
-        vBoxFundo.getChildren().addAll(labelTitulo,infoBox,grid,btnDesistir);
+        labelMensagemFoco = new Label();
+        labelMensagemFoco.setVisible(false);
+        labelMensagemFoco.managedProperty().bind(labelMensagemFoco.visibleProperty());
+        labelMensagemFoco.setAlignment(Pos.CENTER);
+        labelMensagemFoco.setWrapText(true);
+        labelMensagemFoco.setMaxWidth(350);
+        labelMensagemFoco.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+        vBoxFundo.getChildren().addAll(labelTitulo,infoBox,labelMensagemFoco,grid,btnDesistir);
         overlayFimDeJogo = new VBox(25);
         overlayFimDeJogo.setAlignment(Pos.CENTER);
         overlayFimDeJogo.setStyle("-fx-background-color: rgba(20, 30, 55, 0.85);");
@@ -288,23 +297,73 @@ public class App extends Application {
         root.getChildren().addAll(vBoxFundo, overlayFimDeJogo);
         return new Scene(root,400,650);
     }
-    private void processarClique(Carta carta, Button btn, GridPane grid,Stage primaryStage){
-        if(jogo.isBloqueado() || carta.getEstado() != EstadoCarta.VIRADA_BAIXO) return;
+    private void processarClique(Carta carta, Button btn, GridPane grid,Stage primaryStage) {
+        labelMensagemFoco.setVisible(false);
+        if (!cartasDouradas.isEmpty()) {
+            cartasDouradas.clear();
+            atualizarTabuleiroSincronizado(grid);
+        }
+        if (bloqueioPoder || jogo.isBloqueado() || carta.getEstado() != EstadoCarta.VIRADA_BAIXO) return;
         somCarta.play();
+        if (jogo.isModoRevelarEscolha()) {
+            jogo.setModoRevelarEscolha(false);
+            bloqueioPoder = true;
 
-        try{
+            carta.virar();
+            atualizarTabuleiroSincronizado(grid);
+            PauseTransition pausaEspreitar = new PauseTransition(Duration.seconds(2));
+            pausaEspreitar.setOnFinished(e -> {
+                carta.virar();
+                atualizarTabuleiroSincronizado(grid);
+                bloqueioPoder = false;
+            });
+            pausaEspreitar.play();
+            return;
+        }
+
+        try {
             Carta primeira = jogo.getPrimeiraSelecionada();
+            List<Carta> jaEstavamViradas = new java.util.ArrayList<>();
+            for (Carta c : jogo.getTabuleiro().getCartas()) {
+                if (c.getEstado() != EstadoCarta.VIRADA_BAIXO) {
+                    jaEstavamViradas.add(c);
+                }
+            }
             boolean acertou = jogo.escolherCarta(carta);
             btn.setText(carta.getSimbolo());
+            if (carta.getSimbolo().toLowerCase().contains("elefante")) {
+                btn.setStyle(btn.getStyle() + " -fx-text-fill: #F44336;");
+            } else {
+                btn.setStyle(btn.getStyle() + " -fx-text-fill: #000000;");
+            }
+
             atualizarLabels();
-            if(!acertou && primeira != null){
+            if (!acertou && primeira != null) {
                 PausarEEsconder(carta, primeira, btn, grid);
-            }else if(acertou){
+            } else if (acertou) {
                 somParCorreto.play();
-                if(!jogo.getPoderAtivado().isEmpty()){
-                    System.out.println("Poder: "+jogo.getPoderAtivado());
+
+                String nomePoder = jogo.getPoderAtivado();
+                if(nomePoder !=null && !nomePoder.trim().isEmpty()){
+                    if(nomePoder.toLowerCase().contains("revelar")){
+                        for (Carta c : jogo.getTabuleiro().getCartas()) {
+                            if (c.getEstado() != EstadoCarta.VIRADA_BAIXO && !jaEstavamViradas.contains(c) && c != carta) {
+                                if (!cartasDouradas.contains(c)) {
+                                    cartasDouradas.add(c);
+                                }
+                            }
+                        }
+
+                    }
+                    String textoParaMostrar = "✨ PODER: " + nomePoder.toUpperCase() + "✨";
+                    labelMensagemFoco.setText(textoParaMostrar);
+                    labelMensagemFoco.setStyle("-fx-background-color: rgba(45, 26, 104, 0.9); -fx-text-fill: #FFD700; -fx-font-size: 18px; -fx-font-family: 'Arial Black'; -fx-font-weight: bold; -fx-padding: 8 15 8 15; -fx-background-radius: 10; -fx-effect: dropshadow(one-pass-box, black, 0, 0, 3, 3);");
+                    labelMensagemFoco.setVisible(true);
                 }
-                if(jogo.venceu()){
+                atualizarTabuleiroSincronizado(grid);
+                atualizarLabels();
+
+                if (jogo.venceu()){
                     player.pause();
                     jogoGanho.play();
                     PauseTransition pausaMusica1 = new PauseTransition(Duration.seconds(8));
@@ -312,6 +371,9 @@ public class App extends Application {
                     pausaMusica1.play();
 
                     lblOverlayTitulo.setText("NÍVEL " + jogo.getNivelAtual().getNumero() + "\nCONCLUÍDO!");
+                    lblOverlayTitulo.setStyle("-fx-font-family: 'Arial Black'; -fx-font-size: 32px; -fx-text-fill: #4CAF50; -fx-text-alignment: center; -fx-font-weight: bold;");
+
+
                     lblOverlayPontos.setText("PONTOS: " + jogo.getJogador().getPontuacao());
                     lblOverlayTentativas.setText("TENTATIVAS: " + jogo.getJogador().getTentativas());
 
@@ -319,32 +381,74 @@ public class App extends Application {
                     overlayFimDeJogo.setVisible(true);
                 }
             }
-            if(jogo.perdeu()){
+            if (jogo.perdeu()) {
                 player.pause();
                 jogoPerdido.play();
                 PauseTransition pausaMusica2 = new PauseTransition(Duration.seconds(2));
                 pausaMusica2.setOnFinished(event -> player.play());
                 pausaMusica2.play();
 
-                lblOverlayTitulo.setText("NÍVEL " + jogo.getNivelAtual().getNumero() + "\nFALHADO!");;
+                lblOverlayTitulo.setText("NÍVEL " + jogo.getNivelAtual().getNumero() + "\nFALHADO!");
+                lblOverlayTitulo.setStyle("-fx-font-family: 'Arial Black'; -fx-font-size: 32px; -fx-text-fill: #F44336; -fx-text-alignment: center; -fx-font-weight: bold;");
                 lblOverlayPontos.setText("PONTOS: " + jogo.getJogador().getPontuacao());
                 lblOverlayTentativas.setText("TENTATIVAS: " + jogo.getJogador().getTentativas());
 
-                labelMensagemFoco.setText("Game Over!\nSem tentativas.");
-                labelMensagemFoco.setStyle("-fx-text-fill: #F44336; -fx-font-size: 34px; -fx-font-weight: bold; -fx-text-alignment: center;");
                 vBoxFundo.setEffect(new GaussianBlur(12));
                 overlayFimDeJogo.setVisible(true);
             }
-        } catch (JogoException ex){
+        } catch (JogoException ex) {
             System.out.println(ex.getMessage());
         }
-
     }
+        private void ativarPoderVisual(GridPane grid){
+            PauseTransition pausaPoder = new PauseTransition(Duration.seconds(2));
+            pausaPoder.setOnFinished(e -> {
+                        labelMensagemFoco.setVisible(false);
+                    });
+            pausaPoder.play();
+        }
+    private void atualizarTabuleiroSincronizado(GridPane grid) {
+        List<Carta> cartas = jogo.getTabuleiro().getCartas();
+        int colunas = jogo.getNivelAtual().getColunas();
+
+        int tamanhoLetra = (colunas >= 5) ? 9 : ((colunas == 4) ? 11 : 13);
+        String estiloBase = "-fx-font-family: 'Arial Black'; -fx-font-size: " + tamanhoLetra + "px; -fx-padding: 0; -fx-cursor: hand; -fx-background-radius: 10; -fx-border-radius: 10;";
+
+        for (int i = 0; i < grid.getChildren().size(); i++) {
+            if (grid.getChildren().get(i) instanceof Button) {
+                Button btn = (Button) grid.getChildren().get(i);
+                Carta c = cartas.get(i);
+
+                if (c.getEstado() != EstadoCarta.VIRADA_BAIXO) {
+                    btn.setText(c.getSimbolo());
+
+                    if(cartasDouradas.contains(c)){
+                        String estiloBordaDourada  = " -fx-border-color: #FFD700; -fx-border-width: 3px; -fx-border-radius: 8;";
+                        if (c.getSimbolo().toLowerCase().contains("elefante")) {
+                        btn.setStyle(estiloBase + estiloBordaDourada + " -fx-text-fill: #F44336;");
+                    } else {
+                        btn.setStyle(estiloBase + estiloBordaDourada + " -fx-text-fill: #000000;");
+                    }
+                } else {
+                    if (c.getSimbolo().toLowerCase().contains("elefante")) {
+                        btn.setStyle(estiloBase + " -fx-text-fill: #F44336;");
+                    } else {
+                        btn.setStyle(estiloBase + " -fx-text-fill: #000000;");
+                    }
+                }
+            } else {
+                btn.setText("?");
+                btn.setStyle(estiloBase + " -fx-border-color: transparent; -fx-text-fill: black;");
+            }
+        }
+    }
+}
     private void PausarEEsconder(Carta segundaCartaLogica, Carta primeiraCartaLogica, Button btnSegunda, GridPane grid){
         PauseTransition pausa = new PauseTransition(Duration.seconds(1));
         pausa.setOnFinished(event -> {
             jogo.limparTurnoIncorreto(segundaCartaLogica);
             btnSegunda.setText("?");
+            btnSegunda.setStyle(btnSegunda.getStyle() + " -fx-text-fill: black;");
             for (javafx.scene.Node node : grid.getChildren()) {
                 if (node instanceof Button) {
                     Button b = (Button) node;
@@ -352,6 +456,7 @@ public class App extends Application {
                     if (b.getText().equals(primeiraCartaLogica.getSimbolo()) &&
                             primeiraCartaLogica.getEstado() == EstadoCarta.VIRADA_BAIXO) {
                         b.setText("?");
+                        b.setStyle(b.getStyle() + " -fx-text-fill: black;");
                     }
                 }
             }

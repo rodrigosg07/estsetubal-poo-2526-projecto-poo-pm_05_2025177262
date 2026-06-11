@@ -28,8 +28,26 @@ public class Tabuleiro {
             cartas.add(new CartaNormal(i * 2, simbolos.get(i)));
             cartas.add(new CartaNormal(i * 2 + 1, simbolos.get(i)));
         }
-        cartas.add(new CartaEspecial(proximoid, "Elefante"));
-        cartas.add(new CartaEspecial(proximoid + 1, "Elefante"));
+        int randomPoder = (int) (Math.random() * 4);
+
+        switch (randomPoder) {
+            case 0 -> {
+                cartas.add(new CartaRevelar(proximoid, "Elefante"));
+                cartas.add(new CartaRevelar(proximoid + 1, "Elefante"));
+            }
+            case 1 -> {
+                cartas.add(new CartaRevelarPar(proximoid, "Elefante"));
+                cartas.add(new CartaRevelarPar(proximoid + 1, "Elefante"));
+            }
+            case 2 -> {
+                cartas.add(new CartaTentativaExtra(proximoid, "Elefante"));
+                cartas.add(new CartaTentativaExtra(proximoid + 1, "Elefante"));
+            }
+            default -> {
+                cartas.add(new CartaTrocarPosicao(proximoid, "Elefante"));
+                cartas.add(new CartaTrocarPosicao(proximoid + 1, "Elefante"));
+            }
+        }
     }
 
     public void embaralhar() {
