@@ -19,6 +19,8 @@ import java.io.File;
 import java.util.List;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.layout.StackPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 import javax.lang.model.element.NestingKind;
 
@@ -174,6 +176,7 @@ public class App extends Application {
         return new Scene(root,400,650);
 
     }
+
     private void iniciarNivel(int idNivel, Stage primaryStage) {
         jogo.mudarNivel(idNivel);
         jogo.getTabuleiro().inicializar();
@@ -185,6 +188,7 @@ public class App extends Application {
         primaryStage.setScene(cenaDoJogo);
         primaryStage.setTitle("Nível " + idNivel);
     }
+
     private Scene criarCenaDoJogo(Stage primaryStage){
         StackPane root = new StackPane();
         root.setStyle("-fx-background-color: #4286f4;");
@@ -215,7 +219,7 @@ public class App extends Application {
         int colunas = jogo.getNivelAtual().getColunas();
 
         double larguraCarta =(360.0/colunas);
-        double alturaCarta = 60.0;
+        double alturaCarta = 100.0;
 
         int tamanhoLetra;
         if (colunas >= 5) {
@@ -251,8 +255,10 @@ public class App extends Application {
         labelMensagemFoco.managedProperty().bind(labelMensagemFoco.visibleProperty());
         labelMensagemFoco.setAlignment(Pos.CENTER);
         labelMensagemFoco.setWrapText(true);
-        labelMensagemFoco.setMaxWidth(350);
+        labelMensagemFoco.setMaxWidth(380);
+        labelMensagemFoco.setMinHeight(javafx.scene.layout.Region.USE_PREF_SIZE);
         labelMensagemFoco.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+        labelMensagemFoco.setAlignment(javafx.geometry.Pos.CENTER);
         vBoxFundo.getChildren().addAll(labelTitulo,infoBox,labelMensagemFoco,grid,btnDesistir);
         overlayFimDeJogo = new VBox(25);
         overlayFimDeJogo.setAlignment(Pos.CENTER);
@@ -297,6 +303,7 @@ public class App extends Application {
         root.getChildren().addAll(vBoxFundo, overlayFimDeJogo);
         return new Scene(root,400,650);
     }
+
     private void processarClique(Carta carta, Button btn, GridPane grid,Stage primaryStage) {
         labelMensagemFoco.setVisible(false);
         if (!cartasDouradas.isEmpty()) {
@@ -330,16 +337,11 @@ public class App extends Application {
                 }
             }
             boolean acertou = jogo.escolherCarta(carta);
-            btn.setText(carta.getSimbolo());
-            if (carta.getSimbolo().toLowerCase().contains("elefante")) {
-                btn.setStyle(btn.getStyle() + " -fx-text-fill: #F44336;");
-            } else {
-                btn.setStyle(btn.getStyle() + " -fx-text-fill: #000000;");
-            }
+            atualizarTabuleiroSincronizado(grid, primaryStage);
 
             atualizarLabels();
             if (!acertou && primeira != null) {
-                PausarEEsconder(carta, primeira, btn, grid);
+                PausarEEsconder(carta, primeira, btn, grid, primaryStage);
             } else if (acertou) {
                 somParCorreto.play();
 
@@ -357,7 +359,7 @@ public class App extends Application {
                     }
                     String textoParaMostrar = "✨ PODER: " + nomePoder.toUpperCase() + "✨";
                     labelMensagemFoco.setText(textoParaMostrar);
-                    labelMensagemFoco.setStyle("-fx-background-color: rgba(45, 26, 104, 0.9); -fx-text-fill: #FFD700; -fx-font-size: 18px; -fx-font-family: 'Arial Black'; -fx-font-weight: bold; -fx-padding: 8 15 8 15; -fx-background-radius: 10; -fx-effect: dropshadow(one-pass-box, black, 0, 0, 3, 3);");
+                    labelMensagemFoco.setStyle("-fx-background-color: rgba(45, 26, 104, 0.9); -fx-text-fill: #FFD700; -fx-font-size: 15px; -fx-font-family: 'Arial Black'; -fx-font-weight: bold; -fx-padding: 8 15 8 15; -fx-background-radius: 10; -fx-effect: dropshadow(one-pass-box, black, 0, 0, 3, 3);");
                     labelMensagemFoco.setVisible(true);
                 }
                 atualizarTabuleiroSincronizado(grid, primaryStage);
@@ -414,7 +416,7 @@ public class App extends Application {
         int colunas = jogo.getNivelAtual().getColunas();
 
         int tamanhoLetra = (colunas >= 5) ? 9 : ((colunas == 4) ? 11 : 13);
-        String estiloBase = "-fx-font-family: 'Arial Black'; -fx-font-size: " + tamanhoLetra + "px; -fx-padding: 0; -fx-cursor: hand; -fx-background-radius: 10; -fx-border-radius: 10;";
+        String estiloBase = "-fx-font-family: 'Arial Black'; -fx-font-size: " + tamanhoLetra + "px; -fx-cursor: hand; -fx-background-radius: 10; -fx-border-radius: 10;";
 
         for (int i = 0; i < grid.getChildren().size(); i++) {
             if (grid.getChildren().get(i) instanceof Button) {
@@ -424,47 +426,42 @@ public class App extends Application {
                 btn.setOnAction(event -> processarClique(c, btn, grid, primaryStage));
 
                 if (c.getEstado() != EstadoCarta.VIRADA_BAIXO) {
-                    btn.setText(c.getSimbolo());
+                    btn.setText(null);
+                    btn.setGraphic(null); // Já não precisamos do ImageView
 
-                    if(cartasDouradas.contains(c)){
-                        String estiloBordaDourada  = " -fx-border-color: #FFD700; -fx-border-width: 3px; -fx-border-radius: 8;";
-                        if (c.getSimbolo().toLowerCase().contains("elefante")) {
-                            btn.setStyle(estiloBase + estiloBordaDourada + " -fx-text-fill: #F44336;");
-                        } else {
-                            btn.setStyle(estiloBase + estiloBordaDourada + " -fx-text-fill: #000000;");
-                        }
-                       } else {
-                           if (c.getSimbolo().toLowerCase().contains("elefante")) {
-                               btn.setStyle(estiloBase + " -fx-text-fill: #F44336;");
-                           } else {
-                               btn.setStyle(estiloBase + " -fx-text-fill: #000000;");
-                           }
-                       }
+                    String estiloBordaDourada = cartasDouradas.contains(c) ? " -fx-border-color: #FFD700; -fx-border-width: 3px;" : " -fx-border-color: transparent;";
+
+                    try {
+                        String pathImagem = new File("src/main/resources/images/" + c.getSimbolo() + ".png").toURI().toString();
+                        // Aplica a imagem como fundo: preenche 100% e corta os cantos de forma limpa!
+                        String estiloImagem = " -fx-background-image: url('" + pathImagem + "'); " +
+                                " -fx-background-size: 100% 100%; " + // Cobre todo o espaço do botão
+                                " -fx-background-position: center; " +
+                                " -fx-background-repeat: no-repeat; " +
+                                " -fx-background-color: transparent;" + // Esconde o fundo cinzento original
+                                " -fx-background-radius: 10px; ";
+
+                        btn.setStyle(estiloBase + estiloImagem + estiloBordaDourada);
+                    } catch (Exception e) {
+                        btn.setText(c.getSimbolo());
+                        btn.setStyle(estiloBase + estiloBordaDourada + " -fx-text-fill: black; -fx-background-color: white;");
+                    }
                 } else {
                     btn.setText("?");
-                    btn.setStyle(estiloBase + " -fx-border-color: transparent; -fx-text-fill: black;");
+                    btn.setGraphic(null);
+                    // Reset do botão quando está virado para baixo para o fundo cinzento normal
+                    btn.setStyle(estiloBase + " -fx-background-image: null; -fx-background-color: #e0e0e0; -fx-border-color: transparent; -fx-text-fill: black;");
                 }
             }
         }
     }
 
-    private void PausarEEsconder(Carta segundaCartaLogica, Carta primeiraCartaLogica, Button btnSegunda, GridPane grid){
+    private void PausarEEsconder(Carta segundaCartaLogica, Carta primeiraCartaLogica, Button btnSegunda, GridPane grid, Stage primaryStage){
         PauseTransition pausa = new PauseTransition(Duration.seconds(1));
         pausa.setOnFinished(event -> {
             jogo.limparTurnoIncorreto(segundaCartaLogica);
-            btnSegunda.setText("?");
-            btnSegunda.setStyle(btnSegunda.getStyle() + " -fx-text-fill: black;");
-            for (javafx.scene.Node node : grid.getChildren()) {
-                if (node instanceof Button) {
-                    Button b = (Button) node;
-                    // Procura o botão que tem o símbolo da primeira carta
-                    if (b.getText().equals(primeiraCartaLogica.getSimbolo()) &&
-                            primeiraCartaLogica.getEstado() == EstadoCarta.VIRADA_BAIXO) {
-                        b.setText("?");
-                        b.setStyle(b.getStyle() + " -fx-text-fill: black;");
-                    }
-                }
-            }
+            // O atualizarTabuleiroSincronizado trata de esconder as duas cartas automaticamente
+            atualizarTabuleiroSincronizado(grid, primaryStage);
             atualizarLabels();
         });
         pausa.play();
