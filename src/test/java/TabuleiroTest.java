@@ -3,7 +3,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
 public class TabuleiroTest {
-    private Nivel nivel;
+    private final Nivel nivel;
+
+    public TabuleiroTest(Nivel nivel) {
+        this.nivel = nivel;
+    }
 
     @Test
     void testeDeveIncializarComCartas(){

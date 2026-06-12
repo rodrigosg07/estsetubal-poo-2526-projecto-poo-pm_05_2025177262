@@ -4,8 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Tabuleiro {
-    private Carta primeiraCartaSelecionada = null;
-    private Nivel nivel;
+    private final Nivel nivel;
     private List<Carta> cartas;
 
     public Tabuleiro(Nivel nivelAtual) {
@@ -58,13 +57,10 @@ public class Tabuleiro {
         return this.cartas;
     }
 
-    public Carta getCarta(int posicao) {
-        return cartas.get(posicao);
-    }
-
     public void setCartas(List<Carta> cartas) {
         this.cartas = cartas;
     }
+
 }
 
 

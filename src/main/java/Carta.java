@@ -1,6 +1,6 @@
 public abstract class Carta {
-    private int id;
-    private String simbolo;
+    private final int id;
+    private final String simbolo;
     private EstadoCarta estado;
 
     //protected para apenas ser acessada pela propria classe e seus "filhos"

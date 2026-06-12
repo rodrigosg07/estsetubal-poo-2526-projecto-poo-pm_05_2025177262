@@ -9,7 +9,11 @@ public class CartaEspecialTest {
     private Jogo jogo;
     private Jogador jogador;
     private Tabuleiro tabuleiro;
-    private Nivel nivel;
+    private final Nivel nivel;
+
+    public CartaEspecialTest(Nivel nivel) {
+        this.nivel = nivel;
+    }
 
     @BeforeEach
     void setUp(){
@@ -84,7 +88,6 @@ public class CartaEspecialTest {
         tabuleiro.setCartas(listaTabuleiro);
 
         int pontosIniciais = jogador.getPontuacao();
-        int paresIniciais = jogo.getParesEncontrados();
 
         c4.ativar(jogo);
 

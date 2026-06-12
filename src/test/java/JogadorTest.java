@@ -40,7 +40,7 @@ public class JogadorTest {
 
     @Test
     void testeResetDeTentativas(){
-        jogador.resetTentativas(10);
+        jogador.resetTentativas();
 
         assertEquals(10, jogador.getTentativas());
     }

@@ -1,8 +1,8 @@
 public class Nivel {
-    private int numero;
-    private int maxTentativas;
-    private int linhas;
-    private int colunas;
+    private final int numero;
+    private final int maxTentativas;
+    private final int linhas;
+    private final int colunas;
 
     public Nivel(int numero, int maxTentativas, int linhas, int colunas) {
         if (linhas <= 0 || colunas <= 0) throw new NivelException("Dimensões de tabuleiro inválidas");

@@ -1,18 +1,12 @@
 public class Jogador{
-    private String nomeJogador;
     private int pontuacao;
     private int tentativas;
 
     public Jogador(String nomeJogador, int pontuacao, int tentativas){
         if(nomeJogador==null) throw new JogadorException("Tem de colocar nome");
         if(pontuacao<0) throw new JogadorException("A pontuação não pode ser negativa");
-        this.nomeJogador=nomeJogador;
         this.pontuacao=pontuacao;
         setTentativas(tentativas);
-    }
-
-    public String getNomeJogador(){
-        return nomeJogador;
     }
 
     public int getTentativas() {
@@ -37,7 +31,7 @@ public class Jogador{
     public void consumirTentativa(){
         tentativas--;
     }
-    public void resetTentativas(int maxtentativas){
+    public void resetTentativas(){
         pontuacao=0;
     }
     public void resetPontos(){
