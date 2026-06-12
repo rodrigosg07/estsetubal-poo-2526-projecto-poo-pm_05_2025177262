@@ -294,7 +294,7 @@ public class App extends Application {
                 "-fx-text-fill: white; " +
                 "-fx-text-transform: uppercase;");
 
-        //------- Titulo dos as outras informações----------
+        //------- Titulo das outras informações----------
         labelTentativas = new Label(("TENTATIVAS: " + jogo.getJogador().getTentativas()));
         labelPontos = new Label("PONTOS: " + jogo.getJogador().getPontuacao());
 

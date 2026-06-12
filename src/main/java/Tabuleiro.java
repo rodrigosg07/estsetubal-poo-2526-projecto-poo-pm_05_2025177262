@@ -3,15 +3,31 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Representa o tabuleiro do jogo, sendo responsável por gerir o conjunto de cartas em jogo.
+ * Controla a criação estruturada das cartas normais e a inclusão dinâmica de cartas
+ * com poderes especiais, adaptando-se às dimensões especificadas por cada nível.
+ */
 public class Tabuleiro {
     private final Nivel nivel;
     private List<Carta> cartas;
 
+    /**
+     * Constrói uma nova instância do tabuleiro associada a um nível específico.
+     *
+     * @param nivelAtual O nível de jogo que dita o número de linhas e colunas desta grelha.
+     */
     public Tabuleiro(Nivel nivelAtual) {
         this.nivel = nivelAtual;
         this.cartas = new ArrayList<>();
     }
 
+    /**
+     * Inicializa o tabuleiro gerando a lista de cartas necessária para preencher o ecrã.
+     * O metodo limpa o estado anterior, seleciona e baralha os símbolos dos animais para os
+     * pares normais e introduz obrigatoriamente um par de cartas especiais ("Elefante")
+     * cujo poder (Revelar, Revelar Par, Tentativa Extra ou Trocar Posição) é escolhido de forma aleatória.
+     */
     public void inicializar() {
         cartas.clear();
         int numLinhas = nivel.getLinhas();
@@ -49,6 +65,10 @@ public class Tabuleiro {
         }
     }
 
+    /**
+     * Baralha aleatoriamente a disposição física das cartas na lista, garantindo
+     * que as posições dos pares fiquem imprevisíveis a cada nova partida.
+     */
     public void embaralhar() {
         Collections.shuffle(cartas);
     }
@@ -60,7 +80,6 @@ public class Tabuleiro {
     public void setCartas(List<Carta> cartas) {
         this.cartas = cartas;
     }
-
 }
 
 
